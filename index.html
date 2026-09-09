@@ -1226,11 +1226,11 @@
       grades_title: "الدرجات والتقييم", grades_sub: "كشف درجات كل قسم — 3 امتحانات ومعدل اختبارات لكل مادة، مع المجموع والمعدل والرتبة",
       ph_searchStudentCode: "ابحث بالاسم أو رقم ريم", btn_subjectCoefficients: "المواد والأساتذة", btn_printStudentSheet: "طباعة كشف طالب",
       btn_printClassSheets: "طباعة كشوف القسم كاملاً",
-      label_totalSum: "المجموع الكلي", label_annualAverage: "المعدل السنوي العام", label_rank: "الرتبة", label_status: "الحالة",
+      label_totalSum: "المجموع الكلي", label_annualAverage: "المعدل السنوي العام", label_rank: "الرتبة", label_status: "الحالة", label_decision: "القرار",
       btn_saveStudentGrades: "حفظ درجات الطالب", panel_classRanking: "ترتيب القسم", combo_noMatches: "لا توجد نتائج مطابقة",
       th_subject: "المادة", th_subjectsPlural: "المواد", th_exam1: "الامتحان الأول×1", th_exam2: "الامتحان الثاني×2",
       th_exam3: "الامتحان الثالث×3", th_testAvg: "معدل الاختبارات×3", th_subjectAvg: "معدل المادة",
-      th_coefficient: "المعامل", th_multiplier: "الضارب", th_total: "المجموع",
+      th_coefficient: "الضارب", th_multiplier: "الضارب", th_total: "المجموع",
       empty_noActiveStudents: "لا يوجد طلاب نشطون في هذا القسم",
       empty_noSubjectsForClass: "لا توجد مواد محدَّدة لهذا القسم — استخدم زر «معاملات المواد» لإضافتها",
       status_incomplete: "لم يكتمل", status_pass: "ناجح", status_fail: "راسب",
@@ -1572,7 +1572,7 @@
       grades_title: "Notes et évaluation", grades_sub: "Bulletin de notes par classe — 3 examens et une moyenne de contrôles par matière, avec total, moyenne et rang",
       ph_searchStudentCode: "Rechercher par nom ou numéro REIM", btn_subjectCoefficients: "Matières et enseignants", btn_printStudentSheet: "Imprimer le bulletin",
       btn_printClassSheets: "Imprimer tous les bulletins de la classe",
-      label_totalSum: "Total général", label_annualAverage: "Moyenne annuelle générale", label_rank: "Rang", label_status: "Statut",
+      label_totalSum: "Total général", label_annualAverage: "Moyenne annuelle générale", label_rank: "Rang", label_status: "Statut", label_decision: "Décision",
       btn_saveStudentGrades: "Enregistrer les notes de l'élève", panel_classRanking: "Classement de la classe", combo_noMatches: "Aucun résultat correspondant",
       th_subject: "Matière", th_subjectsPlural: "Matières", th_exam1: "1er examen×1", th_exam2: "2e examen×2",
       th_exam3: "3e examen×3", th_testAvg: "Moy. contrôles×3", th_subjectAvg: "Moy. matière",
@@ -3892,7 +3892,7 @@
       '<div><div class="kpi-label">' + esc(tr("label_totalSum")) + '</div><div class="kpi-value tabular" id="gr-sum" dir="ltr" style="text-align:start;font-size:21px;">0.00</div></div>' +
       '<div><div class="kpi-label">' + esc(tr("label_annualAverage")) + '</div><div class="kpi-value tabular" id="gr-avg" dir="ltr" style="text-align:start;font-size:21px;">—</div></div>' +
       '<div><div class="kpi-label">' + esc(tr("label_rank")) + '</div><div class="kpi-value tabular" id="gr-rank" dir="ltr" style="text-align:start;font-size:21px;">—</div></div>' +
-      '<div><div class="kpi-label">' + esc(tr("label_status")) + '</div><div id="gr-status" style="margin-top:7px;">—</div></div>' +
+      '<div><div class="kpi-label">' + esc(tr("label_decision")) + '</div><div id="gr-status" style="margin-top:7px;">—</div></div>' +
       "</div>" +
       '<div style="margin-top:18px;"><button class="btn btn-primary" id="gr-save">' + esc(tr("btn_saveStudentGrades")) + '</button></div>' +
       "</div></div>" +
@@ -4042,7 +4042,7 @@
       return a.st.rank - b.st.rank;
     });
     el.innerHTML =
-      '<div class="table-scroll"><table class="rank-mini-table"><thead><tr><th>' + esc(tr("th_rank")) + '</th><th style="text-align:start;">' + esc(tr("th_student")) + '</th><th>' + esc(tr("th_avgOn20")) + '</th><th>' + esc(tr("label_status")) + '</th></tr></thead><tbody>' +
+      '<div class="table-scroll"><table class="rank-mini-table"><thead><tr><th>' + esc(tr("th_rank")) + '</th><th style="text-align:start;">' + esc(tr("th_student")) + '</th><th>' + esc(tr("th_avgOn20")) + '</th><th>' + esc(tr("label_decision")) + '</th></tr></thead><tbody>' +
       rows.map(function (r) {
         var pass = r.st.avg != null && r.st.avg >= PASS_MARK;
         return (
