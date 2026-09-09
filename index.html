@@ -925,6 +925,8 @@
     state.schedule.periods = (state.schedule.periods && state.schedule.periods.length) ? state.schedule.periods : defaultPeriods();
     state.schedule.slots = state.schedule.slots || {};
     state.academicYears = state.academicYears || [];
+    state.subjects = Array.isArray(state.subjects) ? state.subjects : [];
+    state.deletedSubjects = Array.isArray(state.deletedSubjects) ? state.deletedSubjects : [];
     state.students.forEach(function (s) {
       if (!s.guardians || !Array.isArray(s.guardians) || !s.guardians.length) {
         s.guardians = (s.guardianName || s.guardianPhone)
@@ -1238,10 +1240,13 @@
       th_rank: "الرتبة", th_student: "الطالب", th_avgOn20: "المعدل /20",
       empty_noRankingData: "لا توجد بيانات كافية لعرض الترتيب بعد",
       subjectsManager_title: "المواد والأساتذة", subjectsManager_subtitle: "مواد وأساتذة و ضوارب ",
-      btn_saveCoefficients: "حفظ التعديلات", form_addSubject: "إضافة مادة", allSubjectsAdded: "كل المواد مضافة بالفعل",
+      btn_saveCoefficients: "حفظ التعديلات", form_addSubject: "إضافة مادة", form_newSubject: "مادة جديدة", ph_newSubject: "اكتب اسم المادة", allSubjectsAdded: "كل المواد مضافة بالفعل",
       form_coefficient: "المعامل", btn_addSubjectBtn: "إضافة مادة", form_subjectTeacher: "الأستاذ",
       toast_coefficientsUpdated: "تم حفظ المعاملات", toast_subjectAdded: "تمت إضافة المادة",
       act_coefficientsUpdated: "تم تحديث معاملات مواد ", act_subjectRemoved: "تم حذف مادة من ", act_subjectAdded1: "تمت إضافة مادة ", act_subjectAdded2: " إلى ",
+      subjectsCatalog_label: "قائمة المواد", subjectsCatalog_hint: "لا يمكن حذف مادة مرتبطة بقسم أو أستاذ.",
+      toast_enterSubjectName: "أدخل اسم المادة", toast_subjectExists: "هذه المادة مضافة بالفعل إلى القسم", toast_subjectInUse: "لا يمكن حذف المادة لأنها مسندة إلى قسم أو أستاذ", toast_subjectDeleted: "تم حذف المادة",
+      title_removeSubjectFromClass: "إزالة من القسم",
 
       toast_noActiveStudentsInClass: "لا يوجد طلاب نشطون في هذا القسم",
       printPicker_title: "طباعة كشف الطالب", printPicker_titleClass: "طباعة كشوف القسم كاملاً", form_student: "الطالب", form_decision: "القرار",
@@ -1584,10 +1589,13 @@
       th_rank: "Rang", th_student: "Élève", th_avgOn20: "Moyenne /20",
       empty_noRankingData: "Données insuffisantes pour afficher le classement pour l'instant",
       subjectsManager_title: "Matières et enseignants", subjectsManager_subtitle: "Matières, enseignants et coefficients de ",
-      btn_saveCoefficients: "Enregistrer les modifications", form_addSubject: "Ajouter une matière", allSubjectsAdded: "Toutes les matières ont déjà été ajoutées",
+      btn_saveCoefficients: "Enregistrer les modifications", form_addSubject: "Ajouter une matière", form_newSubject: "Nouvelle matière", ph_newSubject: "Saisir le nom de la matière", allSubjectsAdded: "Toutes les matières ont déjà été ajoutées",
       form_coefficient: "Coefficient", btn_addSubjectBtn: "Ajouter une matière", form_subjectTeacher: "Enseignant",
       toast_coefficientsUpdated: "Coefficients enregistrés", toast_subjectAdded: "Matière ajoutée",
       act_coefficientsUpdated: "Coefficients des matières mis à jour pour ", act_subjectRemoved: "Matière supprimée de ", act_subjectAdded1: "Matière ajoutée : ", act_subjectAdded2: " à ",
+      subjectsCatalog_label: "Liste des matières", subjectsCatalog_hint: "Une matière liée à une classe ou à un enseignant ne peut pas être supprimée.",
+      toast_enterSubjectName: "Saisissez le nom de la matière", toast_subjectExists: "Cette matière est déjà ajoutée à la classe", toast_subjectInUse: "Cette matière ne peut pas être supprimée car elle est liée à une classe ou à un enseignant", toast_subjectDeleted: "Matière supprimée",
+      title_removeSubjectFromClass: "Retirer de la classe",
 
       toast_noActiveStudentsInClass: "Aucun élève actif dans cette classe",
       printPicker_title: "Imprimer le bulletin de l'élève", printPicker_titleClass: "Imprimer tous les bulletins de la classe", form_student: "Élève", form_decision: "Décision",
@@ -2337,6 +2345,29 @@
     "الفرنسية", "الإنجليزية", "الرياضيات", "العلوم الطبيعية", "الفيزياء والكيمياء",
     "التكنولوجيا", "المعلوماتية", "التربية البدنية"
   ];
+  function subjectCatalog() {
+    STATE.subjects = Array.isArray(STATE.subjects) ? STATE.subjects : [];
+    STATE.deletedSubjects = Array.isArray(STATE.deletedSubjects) ? STATE.deletedSubjects : [];
+    SUBJECTS.concat(
+      (STATE.classes || []).flatMap(function (c) { return (c.subjects || []).map(function (s) { return s.subject; }); }),
+      (STATE.teachers || []).map(function (t) { return t.subject; })
+    ).forEach(function (name) {
+      name = (name || "").trim();
+      if (name && STATE.deletedSubjects.indexOf(name) === -1 && STATE.subjects.indexOf(name) === -1) STATE.subjects.push(name);
+    });
+    return STATE.subjects;
+  }
+  function subjectUsage(name) {
+    var classes = (STATE.classes || []).filter(function (c) {
+      return (c.subjects || []).some(function (s) { return s.subject === name; });
+    });
+    var teachers = (STATE.teachers || []).filter(function (t) {
+      return t.subject === name || (STATE.classes || []).some(function (c) {
+        return (c.subjects || []).some(function (s) { return s.subject === name && s.teacherId === t.id; });
+      });
+    });
+    return { classes: classes, teachers: teachers };
+  }
   var TERMS = ["الفصل الأول", "الفصل الثاني"];
   var STAFF_CATEGORIES = [
     "أستاذ", "مدير", "مدير الدروس", "مراقب", "محاسب",
@@ -4078,7 +4109,8 @@
   function renderClassSubjectsManagerBody() {
     var classObj = classById(gradeClass);
     var subjects = classSubjects(classObj);
-    var available = SUBJECTS.filter(function (s) { return !subjects.some(function (x) { return x.subject === s; }); });
+    var catalog = subjectCatalog();
+    var available = catalog.filter(function (s) { return !subjects.some(function (x) { return x.subject === s; }); });
     var body =
       "<p style='margin:0 0 12px;color:var(--ink-soft);font-size:13px;'>" + esc(tr("subjectsManager_subtitle")) + "<b style='color:var(--ink)'>" + esc(classObj.name) + "</b></p>" +
       subjects.map(function (sub, i) {
@@ -4086,19 +4118,24 @@
           '<div class="subjects-manager-row"><span style="flex:1;min-width:110px;font-weight:700;">' + esc(xf(sub.subject)) + "</span>" +
           '<select class="input" style="min-width:150px" id="teacher-' + i + '" title="' + esc(tr("form_subjectTeacher")) + '">' + teachingStaffOptionsHtml(sub.teacherId) + "</select>" +
           '<input type="number" min="1" max="20" class="input" style="width:76px" id="coef-' + i + '" value="' + sub.coefficient + '" title="' + esc(tr("form_coefficient")) + '">' +
-          '<button class="icon-btn icon-btn-delete" data-rm-subject="' + i + '" title="' + esc(tr("common_delete")) + '">' + ICONS.trash + "</button></div>"
+          '<button class="icon-btn icon-btn-delete" data-rm-subject="' + i + '" title="' + esc(tr("title_removeSubjectFromClass")) + '">' + ICONS.trash + "</button></div>"
         );
       }).join("") +
       (subjects.length ? '<div style="margin-top:10px;"><button class="btn btn-sm" id="sm-save-coefs">' + esc(tr("btn_saveCoefficients")) + '</button></div>' : "") +
       '<div class="form-grid" style="margin-top:18px;">' +
-      field(tr("form_addSubject"), available.length
-        ? '<select class="input" id="sm-new-subject">' + available.map(function (s) { return '<option value="' + esc(s) + '">' + esc(xf(s)) + "</option>"; }).join("") + "</select>"
-        : "<p class='cell-muted' style='margin:0;'>" + esc(tr("allSubjectsAdded")) + "</p>") +
-      (available.length ? field(tr("form_subjectTeacher"), '<select class="input" id="sm-new-teacher">' + teachingStaffOptionsHtml(null) + "</select>") : "") +
-      (available.length ? field(tr("form_coefficient"), '<input type="number" min="1" max="20" class="input" id="sm-new-coef" value="2">') : "") +
-      "</div>";
+      field(tr("form_newSubject"), '<input class="input" id="sm-new-subject" list="sm-subject-options" placeholder="' + esc(tr("ph_newSubject")) + '"><datalist id="sm-subject-options">' + available.map(function (s) { return '<option value="' + esc(s) + '"></option>'; }).join("") + "</datalist>") +
+      field(tr("form_subjectTeacher"), '<select class="input" id="sm-new-teacher">' + teachingStaffOptionsHtml(null) + "</select>") +
+      field(tr("form_coefficient"), '<input type="number" min="1" max="20" class="input" id="sm-new-coef" value="2">') +
+      "</div>" +
+      '<div style="margin-top:18px;"><h4 style="margin:0 0 6px;">' + esc(tr("subjectsCatalog_label")) + '</h4><p class="cell-muted" style="margin:0 0 8px;">' + esc(tr("subjectsCatalog_hint")) + "</p>" +
+      '<div class="subjects-catalog">' + catalog.map(function (name, i) {
+        var usage = subjectUsage(name);
+        var inUse = usage.classes.length || usage.teachers.length;
+        return '<div class="subjects-manager-row"><span style="flex:1;min-width:110px;">' + esc(xf(name)) + "</span>" +
+          '<button class="icon-btn icon-btn-delete" data-rm-catalog-subject="' + i + '" title="' + esc(inUse ? tr("toast_subjectInUse") : tr("common_delete")) + '"' + (inUse ? " disabled" : "") + ">" + ICONS.trash + "</button></div>";
+      }).join("") + "</div></div>";
     openModal(tr("subjectsManager_title"), body,
-      '<button class="btn" id="sm-cancel">' + esc(tr("common_close")) + '</button>' + (available.length ? '<button class="btn btn-primary" id="sm-add">' + ICONS.plus + " " + esc(tr("btn_addSubjectBtn")) + "</button>" : ""));
+      '<button class="btn" id="sm-cancel">' + esc(tr("common_close")) + '</button><button class="btn btn-primary" id="sm-add">' + ICONS.plus + " " + esc(tr("btn_addSubjectBtn")) + "</button>");
     document.getElementById("sm-cancel").addEventListener("click", closeModal);
     var saveBtn = document.getElementById("sm-save-coefs");
     if (saveBtn) saveBtn.addEventListener("click", function () {
@@ -4122,13 +4159,28 @@
         renderGrades();
       });
     });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-rm-catalog-subject]"), function (b) {
+      b.addEventListener("click", function () {
+        var name = catalog[+b.getAttribute("data-rm-catalog-subject")];
+        var usage = subjectUsage(name);
+        if (usage.classes.length || usage.teachers.length) { toast(tr("toast_subjectInUse")); return; }
+        if (STATE.deletedSubjects.indexOf(name) === -1) STATE.deletedSubjects.push(name);
+        STATE.subjects = subjectCatalog().filter(function (s) { return s !== name; });
+        scheduleSave(tr("toast_subjectDeleted"));
+        renderClassSubjectsManagerBody();
+      });
+    });
     var addBtn = document.getElementById("sm-add");
     if (addBtn) addBtn.addEventListener("click", function () {
-      var subj = document.getElementById("sm-new-subject").value;
+      var subj = document.getElementById("sm-new-subject").value.trim();
+      if (!subj) { toast(tr("toast_enterSubjectName")); return; }
+      if (subjects.some(function (s) { return s.subject === subj; })) { toast(tr("toast_subjectExists")); return; }
       var coef = Math.max(1, parseFloat(document.getElementById("sm-new-coef").value) || 2);
       var teacherSel = document.getElementById("sm-new-teacher");
       var teacherId = (teacherSel && teacherSel.value) || null;
       classObj.subjects = classObj.subjects || [];
+      STATE.deletedSubjects = STATE.deletedSubjects.filter(function (s) { return s !== subj; });
+      if (subjectCatalog().indexOf(subj) === -1) STATE.subjects.push(subj);
       classObj.subjects.push({ subject: subj, coefficient: coef, teacherId: teacherId });
       scheduleSave(tr("act_subjectAdded1") + subj + tr("act_subjectAdded2") + classObj.name);
       renderClassSubjectsManagerBody();
@@ -5882,14 +5934,14 @@
 
   function openTeacherForm(existing) {
     var isEdit = !!existing;
-    var t = existing || { id: uid("tch"), category: "أستاذ", name: "", subject: SUBJECTS[0], phone: "", email: "", hireDate: todayIso(), status: "نشط", salary: 0, includeSummerMonths: false };
+    var t = existing || { id: uid("tch"), category: "أستاذ", name: "", subject: subjectCatalog()[0] || "", phone: "", email: "", hireDate: todayIso(), status: "نشط", salary: 0, includeSummerMonths: false };
     var category = t.category || "أستاذ";
     var body =
       '<div class="form-grid">' +
       field(tr("form_jobCategory"), '<select class="input" id="t-category">' + STAFF_CATEGORIES.map(function (c) { return '<option value="' + esc(c) + '"' + (c === category ? " selected" : "") + ">" + esc(xf(c)) + "</option>"; }).join("") + "</select>") +
       field(tr("form_fullName"), '<input class="input" id="t-name" value="' + esc(t.name) + '">', true) +
       '<div class="field" id="t-subject-wrap" style="' + (isTeachingCategory(category) ? "" : "display:none;") + '"><label>' + esc(tr("form_specialtySubject")) + '</label><select class="input" id="t-subject">' +
-      SUBJECTS.map(function (s) { return '<option value="' + esc(s) + '"' + (s === t.subject ? " selected" : "") + ">" + esc(xf(s)) + "</option>"; }).join("") + "</select></div>" +
+      subjectCatalog().map(function (s) { return '<option value="' + esc(s) + '"' + (s === t.subject ? " selected" : "") + ">" + esc(xf(s)) + "</option>"; }).join("") + "</select></div>" +
       field(tr("form_staffStatus"), '<select class="input" id="t-status"><option value="نشط"' + (t.status === "نشط" ? " selected" : "") + ">" + esc(xf("نشط")) + "</option><option value=\"إجازة\"" + (t.status === "إجازة" ? " selected" : "") + ">" + esc(xf("إجازة")) + "</option><option value=\"منتهي الخدمة\"" + (t.status === "منتهي الخدمة" ? " selected" : "") + ">" + esc(xf("منتهي الخدمة")) + "</option></select>") +
       field(tr("form_phone"), '<input class="input" dir="ltr" id="t-phone" value="' + esc(t.phone) + '">') +
       field(tr("form_email"), '<input class="input" dir="ltr" id="t-email" value="' + esc(t.email) + '">') +
