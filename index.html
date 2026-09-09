@@ -1241,7 +1241,7 @@
       empty_noRankingData: "لا توجد بيانات كافية لعرض الترتيب بعد",
       subjectsManager_title: "المواد والأساتذة", subjectsManager_subtitle: "مواد وأساتذة و ضوارب ",
       btn_saveCoefficients: "حفظ التعديلات", form_addSubject: "إضافة مادة", form_newSubject: "مادة جديدة", ph_newSubject: "اكتب اسم المادة", allSubjectsAdded: "كل المواد مضافة بالفعل",
-      form_coefficient: "المعامل", btn_addSubjectBtn: "إضافة مادة", form_subjectTeacher: "الأستاذ",
+      form_coefficient: "المعامل", form_multiplier: "الضارب", btn_addSubjectBtn: "إضافة مادة", form_subjectTeacher: "الأستاذ",
       toast_coefficientsUpdated: "تم حفظ المعاملات", toast_subjectAdded: "تمت إضافة المادة",
       act_coefficientsUpdated: "تم تحديث معاملات مواد ", act_subjectRemoved: "تم حذف مادة من ", act_subjectAdded1: "تمت إضافة مادة ", act_subjectAdded2: " إلى ",
       subjectsCatalog_label: "قائمة المواد", subjectsCatalog_hint: "لا يمكن حذف مادة مرتبطة بقسم أو أستاذ.",
@@ -1590,7 +1590,7 @@
       empty_noRankingData: "Données insuffisantes pour afficher le classement pour l'instant",
       subjectsManager_title: "Matières et enseignants", subjectsManager_subtitle: "Matières, enseignants et coefficients de ",
       btn_saveCoefficients: "Enregistrer les modifications", form_addSubject: "Ajouter une matière", form_newSubject: "Nouvelle matière", ph_newSubject: "Saisir le nom de la matière", allSubjectsAdded: "Toutes les matières ont déjà été ajoutées",
-      form_coefficient: "Coefficient", btn_addSubjectBtn: "Ajouter une matière", form_subjectTeacher: "Enseignant",
+      form_coefficient: "Coefficient", form_multiplier: "Coefficient", btn_addSubjectBtn: "Ajouter une matière", form_subjectTeacher: "Enseignant",
       toast_coefficientsUpdated: "Coefficients enregistrés", toast_subjectAdded: "Matière ajoutée",
       act_coefficientsUpdated: "Coefficients des matières mis à jour pour ", act_subjectRemoved: "Matière supprimée de ", act_subjectAdded1: "Matière ajoutée : ", act_subjectAdded2: " à ",
       subjectsCatalog_label: "Liste des matières", subjectsCatalog_hint: "Une matière liée à une classe ou à un enseignant ne peut pas être supprimée.",
@@ -4125,7 +4125,7 @@
       '<div class="form-grid" style="margin-top:18px;">' +
       field(tr("form_newSubject"), '<input class="input" id="sm-new-subject" list="sm-subject-options" placeholder="' + esc(tr("ph_newSubject")) + '"><datalist id="sm-subject-options">' + available.map(function (s) { return '<option value="' + esc(s) + '"></option>'; }).join("") + "</datalist>") +
       field(tr("form_subjectTeacher"), '<select class="input" id="sm-new-teacher">' + teachingStaffOptionsHtml(null) + "</select>") +
-      field(tr("form_coefficient"), '<input type="number" min="1" max="20" class="input" id="sm-new-coef" value="2">') +
+      field(tr("form_multiplier"), '<input type="number" min="1" max="20" class="input" id="sm-new-coef" value="2">') +
       "</div>" +
       '<div style="margin-top:18px;"><h4 style="margin:0 0 6px;">' + esc(tr("subjectsCatalog_label")) + '</h4><p class="cell-muted" style="margin:0 0 8px;">' + esc(tr("subjectsCatalog_hint")) + "</p>" +
       '<div class="subjects-catalog">' + catalog.map(function (name, i) {
